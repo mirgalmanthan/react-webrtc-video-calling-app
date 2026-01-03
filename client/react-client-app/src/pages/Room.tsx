@@ -6,7 +6,7 @@ import { usePeer } from "../services/Peers";
 export const Room = () => {
 
     const [myStream, setMyStream] = useState<MediaStream | null>(null);
-        const [remoteEmailId, setRemoteEmailId] = useState<string | null>(null);
+    const [remoteEmailId, setRemoteEmailId] = useState<string | null>(null);
     const myVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const socket = useSocket();
@@ -73,17 +73,17 @@ export const Room = () => {
             myVideoRef.current.srcObject = myStream;
         }
         if (remoteVideoRef.current && remoteStream) {
-                remoteVideoRef.current.srcObject = remoteStream;
+            remoteVideoRef.current.srcObject = remoteStream;
         }
     }, [myStream, remoteStream]);
 
-    const handleNegotiation = async () => {
-        const localOffer = peer.localDescription;
+    const handleNegotiation = useCallback(async () => {
+        const localOffer = await createOffer();
         socket?.emit('send-offer', {
             offer: localOffer,
             to: remoteEmailId!
         })
-    }
+    }, [createOffer, remoteEmailId, socket]);
     useEffect(() => {
         peer.addEventListener('negotiationneeded', handleNegotiation);
 
